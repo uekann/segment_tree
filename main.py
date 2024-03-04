@@ -8,6 +8,7 @@ class SegmentTree(Generic[_T]):
         l_:list[_T] = list(l)
         length = 1 << (len(l_)-1).bit_length()  # smallest power of 2 greater than or equal to len(l)
         
+        # use None as a unit element
         def f_(x:Optional[_T], y:Optional[_T]) -> Optional[_T]:
             if x is None:
                 return y
@@ -15,56 +16,83 @@ class SegmentTree(Generic[_T]):
                 return x
             return f(x, y)
         
+        # initialize segment tree
         self._l:list[Optional[_T]] = [None] * ((length << 1) - 1)  # segment tree
         self.f = f_
         self._len = length
         
+        # build segment tree
         self._l[length-1:length-1+len(l_)] = l_
         for i in range(length-2, -1, -1):
             self._l[i] = self.f(self._l[2*i+1], self._l[2*i+2])
     
+    
     def __str__(self) -> str:
         return str(list(filter(lambda x: x is not None, self._l[self._len-1:])))
     
+    
     def _get_index(self, start:int, interval:int) -> int:
+        # get the index of the segment tree that corresponds to the interval [start, start+interval)
         return self._len // interval - 1 + start // interval
+    
     
     def __getitem__(self, item:Union[int, slice]) -> _T:
         match item:
             case int():
+                # convert negative index to positive
                 if item < 0:
                     item += self._len
+                    
+                # check if item is out of range
                 if item < 0 or self._len <= item:
                     raise IndexError('index out of range')
-                item += self._len - 1
-                ret = self._l[item]
+                
+                # get item-th element
+                ret = self._l[item - self._len + 1]
+                
                 if ret is None:
                     raise IndexError('index out of range')
                 return ret
+            
             case slice():
                 start, stop, step = item.indices(self._len)
+                
+                # check if slice is valid
                 if (step != 1) or (start < 0) or (stop < 0) or (self._len < start) or (self._len < stop) or (start > stop):
                     raise IndexError(f'slice({start}, {stop}, {step}) not supported')
+                
                 if start == stop:
                     return self[start]
-                max_interval = start & -start if start != 0 else self._len
-                interval = 1 << (min(stop - start, max_interval).bit_length() - 1)
+                
+                
+                max_interval = start & -start if start != 0 else self._len  # largest power of 2 that divides start
+                interval = 1 << (min(stop - start, max_interval).bit_length() - 1)  # largest power of 2 that is less than or equal to stop - start
                 id = self._get_index(start, interval)
                 ret = self._l[id]
                 assert ret is not None
                 start += interval
+                
+                # if needed to get the value of the right end of the slice
                 if start < stop:
                     ret = self.f(ret, self[start:stop])
                     assert ret is not None
+                    
                 return ret
     
     def __setitem__(self, id:int, value:_T) -> None:
+        # convert negative index to positive
         if id < 0:
             id += self._len
+            
+        # check if id is out of range
         if id < 0 or self._len <= id:
             raise IndexError('index out of range')
+        
+        # set id-th element
         id += self._len - 1
         self._l[id] = value
+        
+        # update the segment tree
         while id > 0:
             id = (id - 1) // 2
             self._l[id] = self.f(self._l[id*2+1], self._l[id*2+2])
