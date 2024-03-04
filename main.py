@@ -65,37 +65,26 @@ class SegmentTree(Generic[_T]):
             raise IndexError('index out of range')
         id += self._len - 1
         self._l[id] = value
-        id = (id - 1) // 2
         while id > 0:
-            self._l[id] = self.f(self._l[id*2+1], self._l[id*2+2])
             id = (id - 1) // 2
+            self._l[id] = self.f(self._l[id*2+1], self._l[id*2+2])
 
 
 if __name__ == '__main__':
-    # st = SegmentTree([1, 2, 3, 4, 5], lambda x, y: x+y)
-    # print(st) # [1, 2, 3, 4, 5]
-    # print(st[0]) # 1
-    # print(st[0:3]) # 6
+    l1 = [1, 2, 3, 4, 5, 6]
+    st1 = SegmentTree(l1, max)
+    print(st1) # [1, 2, 3, 4, 5, 6]
+    print(st1[3]) # 4
+    print(st1[:]) # 6
+    print(st1[0:0]) # 1
+    print(st1[2:6]) # 6
+    st1[0] = 7
+    print(st1) # [7, 2, 3, 4, 5, 6]
+    print(st1[:]) # 7
+    print(st1[2:6]) # 6
     
-    # st[4] = 10
-    # print(st) # [10, 2, 3, 4, 5]
-    # print(st[0]) # 10
-    # print(st[0:5]) # 15
-    
-    # l = ["a", "aaa", "ab", "abcd", "d"]
-    # st = SegmentTree(l, lambda x, y: x if len(x) >= len(y) else y)
-    
-    # print(st[:])
-    
-    l:list[tuple[int, int]] = [(1, 1), (1, 5), (1, 3), (1, 4), (1, 5), (1, 4), (1, 5), (1, 5)]
-
-    def f(x:tuple[int, int], y:tuple[int, int]) -> tuple[int, int]:
-        if x[1] > y[1]:
-            return x
-        elif y[1] > x[1]:
-            return y
-        else:
-            return (x[0] + y[0], x[1])
-
-    st = SegmentTree(l, f)
-    print(st[:])
+    l2 = ["a", "aaa", "ab", "abcd", "d"]
+    st2 = SegmentTree(l2, lambda x, y : x if len(x) >= len(y) else y)
+    print(st2) # ['a', 'aaa', 'ab', 'abcd', 'd']
+    print(st2[3]) # abcd
+    print(st2[:]) # abcd
