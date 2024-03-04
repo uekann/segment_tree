@@ -72,12 +72,30 @@ class SegmentTree(Generic[_T]):
 
 
 if __name__ == '__main__':
-    st = SegmentTree([1, 2, 3, 4, 5], lambda x, y: x+y)
-    print(st) # [1, 2, 3, 4, 5]
-    print(st[0]) # 1
-    print(st[0:3]) # 6
+    # st = SegmentTree([1, 2, 3, 4, 5], lambda x, y: x+y)
+    # print(st) # [1, 2, 3, 4, 5]
+    # print(st[0]) # 1
+    # print(st[0:3]) # 6
     
-    st[4] = 10
-    print(st) # [10, 2, 3, 4, 5]
-    print(st[0]) # 10
-    print(st[0:5]) # 15
+    # st[4] = 10
+    # print(st) # [10, 2, 3, 4, 5]
+    # print(st[0]) # 10
+    # print(st[0:5]) # 15
+    
+    # l = ["a", "aaa", "ab", "abcd", "d"]
+    # st = SegmentTree(l, lambda x, y: x if len(x) >= len(y) else y)
+    
+    # print(st[:])
+    
+    l:list[tuple[int, int]] = [(1, 1), (1, 5), (1, 3), (1, 4), (1, 5), (1, 4), (1, 5), (1, 5)]
+
+    def f(x:tuple[int, int], y:tuple[int, int]) -> tuple[int, int]:
+        if x[1] > y[1]:
+            return x
+        elif y[1] > x[1]:
+            return y
+        else:
+            return (x[0] + y[0], x[1])
+
+    st = SegmentTree(l, f)
+    print(st[:])
