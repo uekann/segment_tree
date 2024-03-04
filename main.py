@@ -57,6 +57,18 @@ class SegmentTree(Generic[_T]):
                     ret = self.f(ret, self[start:stop])
                     assert ret is not None
                 return ret
+    
+    def __setitem__(self, id:int, value:_T) -> None:
+        if id < 0:
+            id += self._len
+        if id < 0 or self._len <= id:
+            raise IndexError('index out of range')
+        id += self._len - 1
+        self._l[id] = value
+        id = (id - 1) // 2
+        while id > 0:
+            self._l[id] = self.f(self._l[id*2+1], self._l[id*2+2])
+            id = (id - 1) // 2
 
 
 if __name__ == '__main__':
@@ -64,3 +76,8 @@ if __name__ == '__main__':
     print(st) # [1, 2, 3, 4, 5]
     print(st[0]) # 1
     print(st[0:3]) # 6
+    
+    st[4] = 10
+    print(st) # [10, 2, 3, 4, 5]
+    print(st[0]) # 10
+    print(st[0:5]) # 15
