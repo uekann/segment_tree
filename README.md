@@ -1,11 +1,12 @@
 # pythonによるセグメント木の実装
 
 競プロ勉強用
+mypy推奨
 
 ## コンストラクタ
 
-元の配列`l`と、`l`の要素二つをとってうち一つを返すような関数`f`を渡す。
-`l`はIterableであれば良い。
+インスタンスの生成には、元となる配列`l:Iterable[T]`と、二項演算`f:Callable[[T, T], T]`が必要である。
+なお、`f`は`Callable[[Optional[T], Optional[T]], Optional[T]]`に変換され、`None`を単位元として扱うため、初期化の際に単位元が求められることはない。
 以下の例は、最大値を管理したい場合。
 
 ```python
@@ -74,5 +75,5 @@ l = [1, 2, 3, 4, 5, 6]
 st = SegmentTree(l, max)
 print(st[:]) # 6
 print(st[0:0]) # 1
-print(st[2:4]) # 5
+print(st[2:6]) # 6
 ```
